@@ -27,10 +27,15 @@ public class ScrollController implements ListSelectionListener {
 
 	public void valueChanged(ListSelectionEvent e) {
 		try {
-			List<Tweet> tweets = TweetAction.getListDirtyTweets();
+			List<Tweet> tweets;
 			int index = ((JList<?>) e.getSource()).getSelectedIndex();
 
-			if (tweets == null) tweets = TweetAction.getListCleanTweets();
+			if (TweetAction.getListDirtyTweets() == null){
+				tweets = TweetAction.getListCleanTweets();
+			}
+			else {
+				tweets = TweetAction.getListCleanTweets();
+			}
 
 			if (!e.getValueIsAdjusting()) {
 				//Printing the tweet details in the tweet panel

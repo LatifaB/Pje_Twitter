@@ -38,7 +38,6 @@ public class TweetAction extends Observable {
 	public enum Rate{NEGATIVE, NEUTRAL, POSITIVE};
 	public String recherche;
 
-
 	public static List<Tweet> getListCleanTweets(){return listCleanTweets;}
 	public static List<Tweet> getListDirtyTweets(){return listDirtyTweets;}
 	public void setListCleanTweets(List<Tweet> listTweets){TweetAction.listCleanTweets = listTweets;}
@@ -146,6 +145,7 @@ public class TweetAction extends Observable {
 			}
 
 			setChanged();
+			notifyObservers();
 		} 
 		catch (TwitterException te) {
 			System.out.println("doSearch:TwitterExc");
@@ -247,7 +247,7 @@ public class TweetAction extends Observable {
 						listPosTweets.add(t);
 						break;
 					}
-				}
+				}				
 			} catch (NumberFormatException | IOException e) {
 				System.out.println("load:numFormatExc");
 				System.out.println(e.getMessage());

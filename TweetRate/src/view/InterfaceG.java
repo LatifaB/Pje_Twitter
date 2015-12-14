@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -267,7 +268,7 @@ public class InterfaceG extends JFrame implements Observer {
 		list.addKeyListener(keyControl);
 		
 		//Initialize the controllers
-		SearchController searchControl = new SearchController(model);
+		SearchController searchControl = new SearchController(model, this);
 		RateMethodController ratingMethodControl = new RateMethodController(model);
 		SaveController saveControl = new SaveController(model);
 		DeleteBaseController deleteBaseControl = new DeleteBaseController(model, this);
@@ -288,6 +289,7 @@ public class InterfaceG extends JFrame implements Observer {
 		//Controller for the load base button
 		btnLoadBase.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				model.setListDirtyTweets(new ArrayList<Tweet>());
 				model.setListCleanTweets(TweetAction.getBase());
 				update(model, new Object());
 			}

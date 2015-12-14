@@ -78,16 +78,15 @@ public class BarChart extends JFrame {
 		localBarRenderer.setSeriesPaint(1, localGradientPaint2);
 		localBarRenderer.setSeriesPaint(2, localGradientPaint3);
 		localBarRenderer
-				.setLegendItemToolTipGenerator(new StandardCategorySeriesLabelGenerator(
-						"Tooltip: {0}"));
+		.setLegendItemToolTipGenerator(new StandardCategorySeriesLabelGenerator(
+				"Tooltip: {0}"));
 		CategoryAxis localCategoryAxis = localCategoryPlot.getDomainAxis();
 		localCategoryAxis.setCategoryLabelPositions(CategoryLabelPositions
 				.createUpRotationLabelPositions(0.5235987755982988D));
 		return localJFreeChart;
 	}
 
-	public static JPanel createDemoPanel(String title,
-			Map<String, Integer> donnees) {
+	public static JPanel createDemoPanel(String title, Map<String, Integer> donnees) {
 		JFreeChart localJFreeChart = createChart(title, createDataset(donnees));
 		return new ChartPanel(localJFreeChart);
 	}

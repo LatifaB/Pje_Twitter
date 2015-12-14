@@ -19,9 +19,9 @@ import com.csvreader.CsvWriter;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
-import classification.ClassifBayes;
-import classification.ClassifBayesBiGramme;
-import classification.ClassifKnn;
+import classification.BayesMethod;
+import classification.BayesBiGrammeMethod;
+import classification.KnnMethod;
 import classification.KeywordMethod;
 import twitter4j.Query;
 import twitter4j.Query.ResultType;
@@ -311,19 +311,19 @@ public class TweetAction extends Observable {
 				mark = KeywordMethod.getClassePosNeg(text);
 				break;
 			case "Knn":
-				mark = ClassifKnn.knn(text, 30, baseTweets);
+				mark = KnnMethod.knn(text, 30, baseTweets);
 				break;
 			case "BayesUniPres":
-				mark = ClassifBayes.classifierBayes(listCleanTweets, text, 0);
+				mark = BayesMethod.classifierBayes(listCleanTweets, text, 0);
 				break;
 			case "BayesUniFreq":
-				mark = ClassifBayes.classifierBayes(listCleanTweets, text, 1);
+				mark = BayesMethod.classifierBayes(listCleanTweets, text, 1);
 				break;
 			case "BayesBigPres":
-				mark = ClassifBayesBiGramme.classifierBayesBiGramme(listCleanTweets, text, 1);
+				mark = BayesBiGrammeMethod.classifierBayesBiGramme(listCleanTweets, text, 1);
 				break;
 			case "BayesBigFreq":
-				mark = ClassifBayesBiGramme.classifierBayesBiGramme(listCleanTweets, text, 0);
+				mark = BayesBiGrammeMethod.classifierBayesBiGramme(listCleanTweets, text, 0);
 				break;
 			}
 			tweet.setNote(mark);

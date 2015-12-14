@@ -28,7 +28,6 @@ public class RateMethodController implements ActionListener {
 		List<Tweet> list = TweetAction.getListCleanTweets();
 
 		String text = "";
-		System.out.println(list);
 		if (list == null || list.isEmpty()) text += "Do a research before.\n";
 		if (TweetAction.getBase() == null || TweetAction.getBase().isEmpty()) text += "The tweet base is empty.";
 

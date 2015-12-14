@@ -1,112 +1,103 @@
+/*
+ * Ranking with the positives and negatives words in
+ * the .txt files
+ */
+
 package classification;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+import com.opencsv.CSVReader;
 
 public class KeywordMethod {
 
-	/* CLASSIFICATION PAR RAPPORT AUX FICHIER .TXT (MOTS POSITIFS/NEGATIFS) */
-	/**
-	 * Retourne la classe d'un tweet en fonction du nb de mot positif/négatif
-	 *
-	 * @param tweet
-	 *            Le tweet à classer
-	 * @return la classe du tweet
-	 */
+
 	public static int getClassePosNeg(String tweet) {
-		/* Annotation */
-		int positif = motsPositifs(tweet);
-		int negatif = motsNegatifs(tweet);
+		int pos = nbPosWords(tweet); //number of positive words in the tweet
+		int neg = nbNegWords(tweet); //number of negative words in the tweet
 
-		int result = positif - negatif;
-		if (result > 0) {
+		int result = pos - neg;
+
+		if (result > 0) 
 			return 4;
-		} else {
-			if (result < 0) {
-				return 0;
-			} else {
-				return 2;
-			}
-		}
+		else if (result < 0)
+			return 0;
+		else 
+			return 2;
 	}
 
-	/**
-	 * Calcule le nombre de mots positifs d'un tweet
-	 *
-	 * @param tweet
-	 *            le tweet à tester
-	 *
-	 * @return le nombre de mots positifs du tweet
-	 */
-	private static int motsPositifs(String tweet) {
-		int positif = 0;
+
+	private static int nbPosWords(String tweet) {
+		int pos = 0;
+
+		String fileName = "";
 		try {
-			String fileName = new java.io.File(".").getCanonicalPath()
+			fileName = new java.io.File(".").getCanonicalPath()
 					+ "/tweets/positive.txt";
-			System.out.print("1");
-			InputStream ips = new FileInputStream(fileName);
-			System.out.print("2");
-			InputStreamReader ipsr = new InputStreamReader(ips);
-			System.out.print("3");
-			BufferedReader br = new BufferedReader(ipsr);
-			System.out.print("4");
-			String ligne;
-			String[] mots = null;
-
-			while ((ligne = br.readLine()) != null) {
-				mots = ligne.split(", ");
-
-				for (String mot : mots) {
-
-					if (tweet.contains(mot)) {
-						positif++;
-					}
-				}
-			}
-			ips.close();
-			br.close();
-			ipsr.close();
-		} catch (Exception e) {
-			System.out.println(e.toString());
+		} catch (IOException e1) {
+			System.out.println("keyWord:nbPos:excFilename");
+			System.out.println(e1.getMessage());
 		}
-		return positif;
+
+		CSVReader reader = null;
+		String [] words;
+
+		try {
+			reader = new CSVReader(new FileReader(fileName), ',');
+
+			try {
+				words = reader.readNext();
+				for (int cpt = 0; cpt < words.length-1; cpt++){
+					if (tweet.contains(words[cpt])) pos++;
+				}
+			} catch (NumberFormatException | IOException e) {
+				System.out.println("keyWord:nbPos:exc1");
+				System.out.println(e.getMessage());
+			}
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("keyWord:nbPos:FileNotFound");
+			System.out.println(e.getMessage());
+		}
+		return pos;
 	}
 
-	/**
-	 * Calcule le nombre de mots négatifs d'un tweet
-	 *
-	 * @param tweet
-	 *            le tweet à tester
-	 * @return le nombre de mots négatifs de ce tweet
-	 */
-	private static int motsNegatifs(String tweet) {
-		int negatif = 0;
-		try {
-			String fileName = new java.io.File(".").getCanonicalPath()
-					+ "/tweets/negative.txt";
-			InputStream ips = new FileInputStream(fileName);
-			InputStreamReader ipsr = new InputStreamReader(ips);
-			BufferedReader br = new BufferedReader(ipsr);
-			String ligne;
-			String[] mots = null;
 
-			while ((ligne = br.readLine()) != null) {
-				mots = ligne.split(", ");
-				for (String mot : mots) {
-					if (tweet.contains(mot)) {
-						negatif++;
-					}
-				}
-				ips.close();
-				br.close();
-				ipsr.close();
-			}
-		} catch (Exception e) {
-			System.out.println(e.toString());
+	private static int nbNegWords(String tweet) {
+		int neg = 0;
+
+		String fileName = "";
+		try {
+			fileName = new java.io.File(".").getCanonicalPath()
+					+ "/tweets/negative.txt";
+		} catch (IOException e1) {
+			System.out.println("keyWord:nbNeg:excFilename");
+			System.out.println(e1.getMessage());
 		}
-		return negatif;
+
+		CSVReader reader = null;
+		String [] words;
+
+		try {
+			reader = new CSVReader(new FileReader(fileName), ',');
+
+			try {
+				words = reader.readNext();
+				for (int cpt = 0; cpt < words.length-1; cpt++){
+					if (tweet.contains(words[cpt])) neg++;
+				}
+			} catch (NumberFormatException | IOException e) {
+				System.out.println("keyWord:nbPos:exc1");
+				System.out.println(e.getMessage());
+			}
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("keyWord:nbPos:FileNotFound");
+			System.out.println(e.getMessage());
+		}
+		return neg;
 	}
 
 }

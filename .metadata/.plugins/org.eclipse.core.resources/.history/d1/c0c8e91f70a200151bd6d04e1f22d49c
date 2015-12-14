@@ -1,0 +1,14 @@
+package controler;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import model.performance.ValidationCroisee;
+
+public class StatsController implements ActionListener {
+
+	public void actionPerformed(ActionEvent e) {
+		new ValidationCroisee();
+	}
+
+}

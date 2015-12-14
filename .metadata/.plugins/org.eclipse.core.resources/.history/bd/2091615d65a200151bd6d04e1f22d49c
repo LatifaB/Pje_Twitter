@@ -1,0 +1,398 @@
+/*
+ * This class groups all the model functions (data handling)
+ */
+
+package model;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.csvreader.CsvWriter;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+
+import classification.ClassifBayes;
+import classification.ClassifBayesBiGramme;
+import classification.ClassifKnn;
+import classification.KeywordMethod;
+import twitter4j.Query;
+import twitter4j.Query.ResultType;
+import twitter4j.QueryResult;
+import twitter4j.Status;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
+import view.InterfaceG;
+
+public class TweetAction extends Observable {
+	private static List<Tweet> listCleanTweets, listDirtyTweets, baseTweets,
+	listPosTweets, listNegTweets, listNeuTweets;
+	public enum Rate{NEGATIVE, NEUTRAL, POSITIVE};
+	public String recherche;
+
+
+	public static List<Tweet> getListCleanTweets(){return listCleanTweets;}
+	public static List<Tweet> getListDirtyTweets(){return listDirtyTweets;}
+	public void setListCleanTweets(List<Tweet> listTweets){TweetAction.listCleanTweets = listTweets;}
+	public void setBaseTweets(List<Tweet> base){TweetAction.baseTweets = base;}
+	public void setListDirtyTweets(List<Tweet> listTweets){TweetAction.listDirtyTweets = listTweets;}
+	public static List<Tweet> getBase(){return baseTweets;}
+
+	//Initialize the config of the builder with the user credentials
+	public void initConfig(){
+		ConfigurationBuilder cb = new ConfigurationBuilder();
+		cb.setDebugEnabled(true)
+		.setOAuthConsumerKey(AppliSettings.consumerKey)
+		.setOAuthConsumerSecret(AppliSettings.consumerSecret)
+		.setOAuthAccessToken(AppliSettings.accessToken)
+		.setOAuthAccessTokenSecret(AppliSettings.accessTokenSecret);
+		TwitterFactory tf = new TwitterFactory(cb.build());
+		InterfaceG.twitter = tf.getInstance();
+	}
+
+
+	/**
+	 * Set the proxy configuration for the univ or not
+	 * 
+	 * @param checked : boolean sent by the controller 
+	 */
+	public void setProxy(boolean checked) throws IOException{
+		if (checked){
+			ConfigurationBuilder cb = new ConfigurationBuilder();
+			cb.setDebugEnabled(true)
+			.setOAuthConsumerKey(AppliSettings.consumerKey)
+			.setOAuthConsumerSecret(AppliSettings.consumerSecret)
+			.setOAuthAccessToken(AppliSettings.accessToken)
+			.setOAuthAccessTokenSecret(AppliSettings.accessTokenSecret)
+			.setHttpProxyHost(AppliSettings.proxy)
+			.setHttpProxyPort(AppliSettings.port);	
+			TwitterFactory tf = new TwitterFactory(cb.build());
+			InterfaceG.twitter = tf.getInstance();
+		}
+	}
+
+	/**
+	 * 
+	 * @param rank
+	 * @return the list of negative/positive/neutral tweets depends on the parameter RANK
+	 */
+	public static List<Tweet> getTweetByClasse(Rate rank) {
+		switch (rank) {
+		case POSITIVE:
+			return listPosTweets;
+		case NEGATIVE:
+			return listNegTweets;
+		case NEUTRAL:
+			return listNeuTweets;
+		}
+		return null;
+	}
+
+
+	/**
+	 * Update the ranks in the csv file when the tweet is already in the base but saved with another mark
+	 * @param mark : note of the tweet
+	 * @param row : line of the tweet in the base
+	 * @throws IOException
+	 */
+	public static void updateCSV(int mark, int row) throws IOException {   
+		CSVReader reader = new CSVReader(new FileReader(AppliSettings.filename),';');
+		List<String[]> csvBody = reader.readAll();
+		csvBody.get(row)[4] = Integer.toString(mark);
+		reader.close();
+		
+		CSVWriter writer = new CSVWriter(new FileWriter(AppliSettings.filename),';');
+		writer.writeAll(csvBody);
+		writer.flush();
+		writer.close();
+	}
+
+
+	/**
+	 * Search tweets with the keyword "word" 
+	 *
+	 * @param word : keyword
+	 */
+	public void doSearch(String word) {
+		List<Status> listStatus;
+		listCleanTweets = new ArrayList<Tweet>();
+		listDirtyTweets = new ArrayList<Tweet>();
+
+		try {
+			Query query = new Query(word);
+			query.resultType(ResultType.mixed);
+			query.setLang("fr");
+			query.count(30);
+			QueryResult result = InterfaceG.twitter.search(query);
+
+			listStatus = result.getTweets();
+
+			for (Status status : listStatus) {
+				Tweet tclean = new Tweet(status.getId(), status.getUser().getName(), cleanTweet(status.getText()),
+						status.getCreatedAt().toString(), -1);
+				listCleanTweets.add(tclean);
+
+				Tweet tdirty = new Tweet(status.getId(), status.getUser().getName(), status.getText(),
+						status.getCreatedAt().toString(), -1);
+				listDirtyTweets.add(tdirty);
+			}
+
+			setChanged();
+			notifyObservers();
+		} 
+		catch (TwitterException te) {
+			System.out.println("doSearch:TwitterExc");
+			System.out.println(te.getMessage());
+			System.exit(-1);
+		} catch (IOException e) {
+			System.out.println("doSearch:IOExc");
+			System.out.println(e.getMessage());
+		}
+	}
+
+	/**
+	 * Deletes the tweets base csv file
+	 */
+	public boolean deleteBase(){
+		File f = new File(AppliSettings.filename);
+		boolean del = false;
+		if (f.exists()){
+			del = f.delete();
+			if (del){
+				baseTweets = new ArrayList<Tweet>();
+				listCleanTweets = new ArrayList<Tweet>();
+				listDirtyTweets = new ArrayList<Tweet>();
+				setChanged();
+				notifyObservers();
+			}
+		}
+
+		return del;
+	}
+
+	/**
+	 * Adds the seached tweets to the file tweetsBase.csv
+	 *
+	 */
+	public void saveBase() {
+		try {
+			if (baseTweets == null){
+				baseTweets = new ArrayList<Tweet>();
+			}
+			CsvWriter csvOutput = new CsvWriter(new FileWriter(AppliSettings.filename, true), ';');
+			for (Tweet tweet : listCleanTweets){
+				int index = alreadyIn(tweet.getId());
+				if (index == -1){
+					csvOutput.write(""+tweet.getId());
+					csvOutput.write(tweet.getUser());
+					String text = cleanTweet(tweet.getTweet());
+					csvOutput.write(text);
+					csvOutput.write(""+tweet.getDate());
+					csvOutput.write(""+tweet.getNote());
+					csvOutput.endRecord();
+					baseTweets.add(tweet);
+				}
+				else {
+					updateCSV(tweet.getNote(), index);
+				}
+			}
+
+			csvOutput.close();
+		} catch (IOException e) {
+			System.out.println("saveBase");
+			System.out.println(e.getMessage());
+		}
+	}
+
+
+	/**
+	 * Load the base tweet, and initialize the tweet list and the classification list
+	 *
+	 */
+	public static void loadBaseTweet() {
+		baseTweets = new ArrayList<Tweet>();
+		listCleanTweets = new ArrayList<Tweet>();
+		listNegTweets = new ArrayList<Tweet>();
+		listNeuTweets = new ArrayList<Tweet>();
+		listPosTweets = new ArrayList<Tweet>();
+
+		CSVReader reader = null;
+		String [] nextLine;
+
+		try {
+			reader = new CSVReader(new FileReader(AppliSettings.filename), ';');
+
+			try {
+				while ((nextLine = reader.readNext()) != null) {
+					Tweet t = new Tweet(Long.parseLong(nextLine[0]), nextLine[1], nextLine[2], 
+							nextLine[3], Integer.parseInt(nextLine[4]));
+					baseTweets.add(t);
+					listCleanTweets.add(t);
+
+					switch (t.getNote()) {
+					case 0:
+						listNegTweets.add(t);
+						break;
+					case 2:
+						listNeuTweets.add(t);
+						break;
+					case 4:
+						listPosTweets.add(t);
+						break;
+					}
+				}				
+			} catch (NumberFormatException | IOException e) {
+				System.out.println("load:numFormatExc");
+				System.out.println(e.getMessage());
+			}
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("load:fileExc");
+			System.out.println(e.getMessage());
+		}
+	}
+
+
+	/**
+	 * Tests if the tweet is already in the base csv
+	 * @param id
+	 * @return index where the tweet was found, otherwise -1
+	 */
+	public int alreadyIn(long id) {
+		CSVReader reader = null;
+		String [] nextLine;
+
+		try {
+			reader = new CSVReader(new FileReader(AppliSettings.filename), ';');
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("alreadyIn:fileNotFound");
+			System.out.println(e.getMessage());
+		}
+
+		try {
+			int i =0;
+			while ((nextLine = reader.readNext()) != null) {
+				if (nextLine[0].equals(Long.toString(id))){
+					reader.close();
+					return i;
+				}
+				i++;
+			}
+		} 
+		catch (IOException e) {
+			System.out.println("alreadyIn:IOExc");
+			System.out.println(e.getMessage());
+		}
+		return -1;
+	}
+
+
+	/**
+	 * Note the tweets with the chosen method
+	 * @param listeTweets : list of tweets
+	 * @param algo : choice of the ranking method
+	 * @throws IOException
+	 */
+	public void rateTweets(List<Tweet> listeTweets, String algo) throws IOException {
+		for (Tweet tweet : listCleanTweets) {
+			String text = tweet.getTweet();
+			int mark = 0;
+
+			switch (algo) {
+			case "Keyword":
+				mark = KeywordMethod.getClassePosNeg(text);
+				break;
+			case "Knn":
+				mark = ClassifKnn.knn(text, 30, baseTweets);
+				break;
+			case "BayesUniPres":
+				mark = ClassifBayes.classifierBayes(listCleanTweets, text, 0);
+				break;
+			case "BayesUniFreq":
+				mark = ClassifBayes.classifierBayes(listCleanTweets, text, 1);
+				break;
+			case "BayesBigPres":
+				mark = ClassifBayesBiGramme.classifierBayesBiGramme(listCleanTweets, text, 1);
+				break;
+			case "BayesBigFreq":
+				mark = ClassifBayesBiGramme.classifierBayesBiGramme(listCleanTweets, text, 0);
+				break;
+			}
+			tweet.setNote(mark);
+		}
+	}
+
+
+	/**
+	 * Clean the tweet (delete the #, @, punctuation)
+	 * @param tweet
+	 * @throws IOException
+	 */
+	public String cleanTweet(String tweets) throws IOException {
+		String res;
+		Pattern url = Pattern.compile("(http)s*:*/*/*t*(.)*c*o*/*[a-zA-Z0-9]*");
+		Matcher tweet = url.matcher(tweets);
+		res = tweet.replaceAll("");
+		Pattern nombre = Pattern.compile("[0-9]+[0-9]*");
+		tweet = nombre.matcher(res);
+		res = tweet.replaceAll("XX");
+		Pattern RT = Pattern.compile("(RT @)[a-zA-Z0-9]*(: )");
+		tweet = RT.matcher(res);
+		res = tweet.replaceAll(" ");
+		Pattern arobase = Pattern.compile("@");
+		tweet = arobase.matcher(res);
+		res = tweet.replaceAll("");
+		Pattern diese = Pattern.compile("#");
+		tweet = diese.matcher(res);
+		res = tweet.replaceAll("");
+		Pattern retourLigne = Pattern.compile("\n");
+		tweet = retourLigne.matcher(res);
+		res = tweet.replaceAll("");
+		Pattern caracNonImprimable = Pattern.compile("[^\\w\\s\\p{Punct}]*", Pattern.UNICODE_CHARACTER_CLASS);
+		tweet = caracNonImprimable.matcher(res);
+		res = tweet.replaceAll("");
+		Pattern guillemet = Pattern.compile("[\"«»]");
+		tweet = guillemet.matcher(res);
+		res = tweet.replaceAll("");
+		Pattern plsPointInterogExclam = Pattern.compile("((\\!)*(\\?)*)+");
+		tweet = plsPointInterogExclam.matcher(res);
+		res = tweet.replaceAll("");
+		Pattern pointDeSuspention = Pattern.compile("(\\.\\.)(\\.)+");
+		tweet = pointDeSuspention.matcher(res);
+		res = tweet.replaceAll(" ");
+		Pattern espacePonct = Pattern.compile("(\\p{Punct})[^(\\p{Punct})\\p{Punct}+](\\.\\.\\.)*");
+		tweet = espacePonct.matcher(res);
+		res = tweet.replaceAll(" ");
+		Pattern eAccent = Pattern.compile("é|è|ê|ë");
+		tweet = eAccent.matcher(res);
+		res = tweet.replaceAll("e");
+		Pattern aAccent = Pattern.compile("à|â|ä");
+		tweet = aAccent.matcher(res);
+		res = tweet.replaceAll("a");
+		Pattern uAccent = Pattern.compile("û|ü|ù");
+		tweet = uAccent.matcher(res);
+		res = tweet.replaceAll("u");
+		Pattern iAccent = Pattern.compile("î|ï|ì");
+		tweet = iAccent.matcher(res);
+		res = tweet.replaceAll("i");
+		Pattern oAccent = Pattern.compile("ô|ö|ò");
+		tweet = oAccent.matcher(res);
+		res = tweet.replaceAll("o");
+		return res;	
+	}
+
+	//Launches the app
+	public static void main(String[] args) throws IOException {
+		new InterfaceG(new TweetAction());
+	}
+
+}

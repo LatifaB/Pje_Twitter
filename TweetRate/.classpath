@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Malik Lil&apos;Oz/Documents/MASTER1/Pje_Twitter/TweetRate/lib/twitter4j-4.0.2/lib/twitter4j-core-4.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Malik Lil&apos;Oz/Documents/MASTER1/Pje_Twitter/TweetRate/lib/javacsv2.1/javacsv.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Malik Lil&apos;Oz/Documents/MASTER1/Pje_Twitter/TweetRate/lib/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Malik Lil&apos;Oz/Documents/MASTER1/Pje_Twitter/TweetRate/lib/jfreechart-1.0.19/lib/jfreechart-1.0.19-swt.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Malik Lil&apos;Oz/Documents/MASTER1/Pje_Twitter/TweetRate/lib/jfreechart-1.0.19/lib/jcommon-1.0.23.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Malik Lil&apos;Oz/Documents/MASTER1/Pje_Twitter/TweetRate/lib/opencsv-3.6.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

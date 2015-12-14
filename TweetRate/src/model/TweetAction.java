@@ -359,7 +359,7 @@ public class TweetAction extends Observable {
 		Pattern caracNonImprimable = Pattern.compile("[^\\w\\s\\p{Punct}]*", Pattern.UNICODE_CHARACTER_CLASS);
 		tweet = caracNonImprimable.matcher(res);
 		res = tweet.replaceAll("");
-		Pattern guillemet = Pattern.compile("[\"Â«Â»]");
+		Pattern guillemet = Pattern.compile("[\"«»]");
 		tweet = guillemet.matcher(res);
 		res = tweet.replaceAll("");
 		Pattern plsPointInterogExclam = Pattern.compile("((\\!)*(\\?)*)+");
@@ -371,6 +371,21 @@ public class TweetAction extends Observable {
 		Pattern espacePonct = Pattern.compile("(\\p{Punct})[^(\\p{Punct})\\p{Punct}+](\\.\\.\\.)*");
 		tweet = espacePonct.matcher(res);
 		res = tweet.replaceAll(" ");
+		Pattern eAccent = Pattern.compile("é|è|ê|ë");
+		tweet = eAccent.matcher(res);
+		res = tweet.replaceAll("e");
+		Pattern aAccent = Pattern.compile("à|â|ä");
+		tweet = aAccent.matcher(res);
+		res = tweet.replaceAll("a");
+		Pattern uAccent = Pattern.compile("û|ü|ù");
+		tweet = uAccent.matcher(res);
+		res = tweet.replaceAll("u");
+		Pattern iAccent = Pattern.compile("î|ï|ì");
+		tweet = iAccent.matcher(res);
+		res = tweet.replaceAll("i");
+		Pattern oAccent = Pattern.compile("ô|ö|ò");
+		tweet = oAccent.matcher(res);
+		res = tweet.replaceAll("o");
 		return res;	
 	}
 

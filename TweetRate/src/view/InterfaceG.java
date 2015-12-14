@@ -186,6 +186,7 @@ public class InterfaceG extends JFrame implements Observer {
 		btnKeyword.setBounds(140, 300, 125, 25);
 		btnKeyword.setBackground(new Color(51, 102, 102));
 		btnKeyword.setForeground(Color.white);
+		btnKeyword.setToolTipText("Ranking with the keyword method");
 		panelTweet.add(btnKeyword);
 
 		//Button knn 
@@ -193,6 +194,7 @@ public class InterfaceG extends JFrame implements Observer {
 		btnKnn.setBounds(270, 300, 125, 25);
 		btnKnn.setBackground(new Color(51, 102, 102));
 		btnKnn.setForeground(Color.white);
+		btnKnn.setToolTipText("Ranking with the knn method");
 		panelTweet.add(btnKnn);
 
 		//Button bayesUniPres
@@ -200,6 +202,7 @@ public class InterfaceG extends JFrame implements Observer {
 		btnBayesUniPres.setBounds(400, 300, 125, 25);
 		btnBayesUniPres.setBackground(new Color(51, 102, 102));
 		btnBayesUniPres.setForeground(Color.white);
+		btnBayesUniPres.setToolTipText("Ranking with the bayes presence method");
 		panelTweet.add(btnBayesUniPres);
 
 		//Button bayesUniFreq
@@ -207,6 +210,7 @@ public class InterfaceG extends JFrame implements Observer {
 		btnBayesUniFreq.setBounds(140, 330, 125, 25);
 		btnBayesUniFreq.setBackground(new Color(51, 102, 102));
 		btnBayesUniFreq.setForeground(Color.white);
+		btnBayesUniFreq.setToolTipText("Ranking with the bayes frequence method");
 		panelTweet.add(btnBayesUniFreq);
 
 		//Buton bayesBigPres
@@ -214,6 +218,7 @@ public class InterfaceG extends JFrame implements Observer {
 		btnBayesBigPres.setBounds(270, 330, 125, 25);
 		btnBayesBigPres.setBackground(new Color(51, 102, 102));
 		btnBayesBigPres.setForeground(Color.white);
+		btnBayesBigPres.setToolTipText("Ranking with the bayes bigram presence method");
 		panelTweet.add(btnBayesBigPres);
 
 		//Button bayesBigFreq
@@ -221,6 +226,7 @@ public class InterfaceG extends JFrame implements Observer {
 		btnBayesBigFreq.setBounds(400, 330, 125, 25);
 		btnBayesBigFreq.setBackground(new Color(51, 102, 102));
 		btnBayesBigFreq.setForeground(Color.white);
+		btnBayesBigFreq.setToolTipText("Ranking with the bayes bigram frequence method");
 		panelTweet.add(btnBayesBigFreq);
 
 		//Button statistics

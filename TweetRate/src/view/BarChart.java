@@ -30,7 +30,7 @@ public class BarChart extends JFrame {
 	public BarChart(String title, Map<String, Integer> data) {
 		super(title);
 		JPanel localJPanel = createDemoPanel(title, data);
-		localJPanel.setPreferredSize(new Dimension(500, 270));
+		localJPanel.setPreferredSize(new Dimension(500, 500));
 		setContentPane(localJPanel);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		pack();

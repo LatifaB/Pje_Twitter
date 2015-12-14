@@ -314,16 +314,16 @@ public class TweetAction extends Observable {
 				mark = KnnMethod.knn(text, 30, baseTweets);
 				break;
 			case "BayesUniPres":
-				mark = BayesMethod.classifierBayes(listCleanTweets, text, 0);
+				mark = BayesMethod.rankBayes(listCleanTweets, text, 0);
 				break;
 			case "BayesUniFreq":
-				mark = BayesMethod.classifierBayes(listCleanTweets, text, 1);
+				mark = BayesMethod.rankBayes(listCleanTweets, text, 1);
 				break;
 			case "BayesBigPres":
-				mark = BayesBiGrammeMethod.classifierBayesBiGramme(listCleanTweets, text, 1);
+				mark = BayesBiGrammeMethod.rankBigramBayes(listCleanTweets, text, 1);
 				break;
 			case "BayesBigFreq":
-				mark = BayesBiGrammeMethod.classifierBayesBiGramme(listCleanTweets, text, 0);
+				mark = BayesBiGrammeMethod.rankBigramBayes(listCleanTweets, text, 0);
 				break;
 			}
 			tweet.setNote(mark);

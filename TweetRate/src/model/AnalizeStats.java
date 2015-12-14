@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import classification.BayesBiGrammeMethod;
 import classification.BayesMethod;
 import classification.KnnMethod;
 import classification.KeywordMethod;
@@ -34,7 +35,7 @@ public class AnalizeStats {
 			System.out.println(e.getMessage());
 			System.out.println("AnalizeStats:construc");
 		}
-		
+
 		createRatioBase();
 
 		new PieChart("Ratio Tweets Base", dataBase);
@@ -46,7 +47,7 @@ public class AnalizeStats {
 	public void createSubsets() throws IOException {
 		List<Tweet> base = TweetAction.getBase();
 		int neg = 0, pos = 0, neu = 0;
-		
+
 		set = new ArrayList<List<Tweet>>(nbSubset);
 		ref = new HashMap<Tweet, Integer>();
 		for (int i = 0; i < nbSubset; i++) {
@@ -93,93 +94,52 @@ public class AnalizeStats {
 		try {
 			createSubsets();
 		} catch (IOException e) {
-			System.out.println("Erreur lors de la creation des sous ensembles");
+			System.out.println(e.getMessage());
+			System.out.println("Analize:calcErrorRate:IOExcep");
 		}
 
 		for (int i = 0; i < nbSubset; i++) {
-			List<Tweet> baseCalcul = concatEnsemble(i);
+			List<Tweet> baseCalcul = concatSet(i);
 
 			for (Tweet tweetcourrant : set.get(i)) {
-				classeKnn = KnnMethod.knn(tweetcourrant.getTweet(), 30,
-						baseCalcul);
-
-
-				classePosNeg = KeywordMethod.getClassePosNeg(tweetcourrant
-						.getTweet());
-
-				classeBayesUniPres = BayesMethod.classifierBayes(baseCalcul,
-						tweetcourrant.getTweet(), 0);
-				/*
-				 * classeBayesUniFreq = ClassifBayes.classifierBayes(baseCalcul,
-				 * tweetcourrant.getTweet(), 1); classeBayesBiGPres =
-				 * ClassifBayesBiGramme .classifierBayesBiGramme(baseCalcul,
-				 * tweetcourrant.getTweet(), 0); classeBayesBiGFreq =
-				 * ClassifBayesBiGramme .classifierBayesBiGramme(baseCalcul,
-				 * tweetcourrant.getTweet(), 1);
-				 */
+				classeKnn = KnnMethod.knn(tweetcourrant.getTweet(), 30,	baseCalcul);
+				classePosNeg = KeywordMethod.getClassePosNeg(tweetcourrant.getTweet());
+				classeBayesUniPres = BayesMethod.rankBayes(baseCalcul, tweetcourrant.getTweet(), 0);
+				classeBayesUniFreq = BayesMethod.rankBayes(baseCalcul, tweetcourrant.getTweet(), 1);
+				classeBayesBiGPres = BayesBiGrammeMethod .rankBigramBayes(baseCalcul, tweetcourrant.getTweet(), 0);
+				classeBayesBiGFreq = BayesBiGrammeMethod .rankBigramBayes(baseCalcul, tweetcourrant.getTweet(), 1);
 
 				// Verification de la notation de chaque classifieur
-				if (classeKnn != ref.get(tweetcourrant)) {
-					errKnn++;
-				}
-
-				if (classePosNeg != ref.get(tweetcourrant)) {
-					errPosNeg++;
-				}
-				if (classeBayesUniPres != ref.get(tweetcourrant)) {
-					errBayesUniPres++;
-
-				}
-				/*
-				 * if (classeBayesUniFreq != reference.get(tweetcourrant)) {
-				 * errBayesUniFreq++;
-				 * 
-				 * } if (classeBayesBiGFreq != reference.get(tweetcourrant)) {
-				 * errBayesBigFreq++; } if (classeBayesBiGPres !=
-				 * reference.get(tweetcourrant)) { errBayesBigPres++; }
-				 */
-
+				if (classeKnn != ref.get(tweetcourrant)) errKnn++;
+				if (classePosNeg != ref.get(tweetcourrant)) errPosNeg++;
+				if (classeBayesUniPres != ref.get(tweetcourrant)) errBayesUniPres++;
+				if (classeBayesUniFreq != ref.get(tweetcourrant)) errBayesUniFreq++;
+				if (classeBayesBiGFreq != ref.get(tweetcourrant)) errBayesBigFreq++;
+				if (classeBayesBiGPres != ref.get(tweetcourrant)) errBayesBigPres++; 
 			}
 		}
 
-		// Enregistrement des données
-		dataBayes.put("UnigrammeFreq",
-				(int) (((float) errBayesUniFreq / ref.size()) * 100));
-		dataBayes.put("UnigrammePres",
-				(int) (((float) errBayesUniPres / ref.size()) * 100));
-		dataBayes.put("BigrammeFreq",
-				(int) (((float) errBayesBigFreq / ref.size()) * 100));
-		dataBayes.put("BigrammePres",
-				(int) (((float) errBayesBigPres / ref.size()) * 100));
+		dataBayes.put("UnigrammeFreq", (int) (((float) errBayesUniFreq / ref.size()) * 100));
+		dataBayes.put("UnigrammePres", (int) (((float) errBayesUniPres / ref.size()) * 100));
+		dataBayes.put("BigrammeFreq", (int) (((float) errBayesBigFreq / ref.size()) * 100));
+		dataBayes.put("BigrammePres", (int) (((float) errBayesBigPres / ref.size()) * 100));
 
-		dataKnnKeyword.put("Knn",
-				(int) (((float) errKnn / ref.size()) * 100));
-		dataKnnKeyword.put("Pos/Neg",
-				(int) (((float) errPosNeg / ref.size()) * 100));
-
+		dataKnnKeyword.put("Knn", (int) (((float) errKnn / ref.size()) * 100));
+		dataKnnKeyword.put("Pos/Neg", (int) (((float) errPosNeg / ref.size()) * 100));
 	}
 
-	/**
-	 * Fait l'union de tout les sous-ensembles sauf celui qui doit être noté
-	 * 
-	 * @param exception
-	 *            indice du sous-ensemble à ne pas prendre en compte
-	 * @return la liste de tweet des sous-ensembles concaténés
-	 */
-	public List<Tweet> concatEnsemble(int exception) {
-		List<Tweet> concat = new ArrayList<Tweet>();
-		for (int i = 0; i < set.size(); i++) {
-			if (i != exception) {
-				concat.addAll(set.get(i));
-			}
-		}
 
+	public List<Tweet> concatSet(int exception) {
+		List<Tweet> concat = new ArrayList<Tweet>();
+		
+		for (int i = 0; i < set.size(); i++) 
+			if (i != exception)	concat.addAll(set.get(i));
+		
 		return concat;
 	}
 
 	/**
-	 * Calcule le ratio des tweets positifs, negatifs et neutres de la base
-	 * d'apprentissage
+	 * Calculate % pos/neg/neu tweets in the base
 	 */
 	public void createRatioBase() {
 		float pos, neg, neu;
@@ -191,7 +151,6 @@ public class AnalizeStats {
 		dataBase.put("Positif", pos);
 		dataBase.put("Negatif", neg);
 		dataBase.put("Neutre", neu);
-
 	}
 
 }

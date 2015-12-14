@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<qualifiedTypeNameHistroy/>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="view.InterfaceG"/>
+<fullyQualifiedTypeName name="model.TweetAction"/>
+<fullyQualifiedTypeName name="model.TweetAction.Rate"/>
+<fullyQualifiedTypeName name="java.lang.Math"/>
+<fullyQualifiedTypeName name="classification.BayesMethod"/>
+<fullyQualifiedTypeName name="classification.BayesBiGrammeMethod"/>
+</qualifiedTypeNameHistroy>

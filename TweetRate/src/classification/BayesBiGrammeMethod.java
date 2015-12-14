@@ -217,7 +217,7 @@ public class BayesBiGrammeMethod {
 	 * classif = 0 for presence 
 	 * 	       = 1 for frequence
 	 */
-	public static int classifierBayesBiGramme(List<Tweet> listTweets,
+	public static int rankBigramBayes(List<Tweet> listTweets,
 			String tweet, int classif) {
 		List<Tweet> listNeg, listPos, listNeutre;
 		listNeg = TweetAction.getTweetByClasse(Rate.NEGATIVE);

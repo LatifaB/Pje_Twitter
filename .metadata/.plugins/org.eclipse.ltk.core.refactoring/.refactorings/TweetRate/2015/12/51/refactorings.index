@@ -42,3 +42,7 @@
 1450109093461	Rename local variable 'listNeutre'
 1450110485548	Rename local variable 'probaNeutre'
 1450110548829	Rename local variable 'probaNeutre'
+1450111382635	Rename local variable 'donnees'
+1450112089510	Rename method 'classifierBayes'
+1450112104233	Rename method 'classifierBayesBiGramme'
+1450112358989	Rename method 'concatEnsemble'

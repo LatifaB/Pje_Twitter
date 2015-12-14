@@ -207,7 +207,7 @@ public class BayesMethod {
 	 * classif = 0 for presence 
 	 * 	       = 1 for frequence
 	 */
-	public static int classifierBayes(List<Tweet> listTweets, String tweet, int classif) {
+	public static int rankBayes(List<Tweet> listTweets, String tweet, int classif) {
 		List<Tweet> listNeg, listPos, listNeu;
 		listNeg = TweetAction.getTweetByClasse(Rate.NEGATIVE);
 		listNeu = TweetAction.getTweetByClasse(Rate.NEUTRAL);

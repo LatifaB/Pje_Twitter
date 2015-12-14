@@ -10,20 +10,6 @@ import model.Tweet;
 
 public class ClassifBayesBiGramme {
 
-	/**
-	 * Fonction qui permet de mettre a la puissance b
-	 * 
-	 * @param a
-	 * @param b
-	 * @return a puissance b
-	 */
-	private static float myPow(float a, float b) {
-		float res = 1;
-		for (int i = 0; i < b; i++) {
-			res *= a;
-		}
-		return res;
-	}
 
 	/**
 	 * Calcule les trois .csv negatifs, positifs et neutre et renvoie le tableau
@@ -240,8 +226,8 @@ public class ClassifBayesBiGramme {
 										/ ((float) (nbMotsTotMood + nbTotal));
 							} else {
 								/* Frequence */
-								probaMot = myPow(
-										(((float) (nbMotsMood[j] + 1)) / ((float) (nbMotsTotMood + nbTotal))),
+								probaMot = (float) Math.pow(
+										(((double) (nbMotsMood[j] + 1)) / ((double) (nbMotsTotMood + nbTotal))),
 										nbMotsTweet[i]);
 
 							}

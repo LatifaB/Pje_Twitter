@@ -30,13 +30,15 @@ public class ClassifKnn {
 
 		for (String element : tab1) {
 			for (String element2 : tab2) {
+				System.out.println("-------------------");
+				System.out.println(element);
+				System.out.println(element2);
 				if (element.equals(element2)) {
 					nbMotsCommuns++;
 				}
 			}
 		}
 
-		// System.out.println(nbMotsCommuns);
 		return ((nbTotal - nbMotsCommuns) / nbTotal);
 	}
 
@@ -131,7 +133,6 @@ public class ClassifKnn {
 		int i, j;
 		String newTweet;
 		int classe;
-		// System.out.println("Tweet a classer : " + t);
 		for (i = 0; i < k; i++) {
 			// On récupère les informations du tweet
 			newTweet = listName.get(i).getTweet();
@@ -142,7 +143,6 @@ public class ClassifKnn {
 			voisins.put(newTweet, classe);
 
 		}
-		// System.out.println("Taille voisins : " + voisins.size());
 
 		for (j = i; j < listName.size(); j++) {
 			newTweet = listName.get(j).getTweet();

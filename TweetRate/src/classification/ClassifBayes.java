@@ -10,21 +10,7 @@ import model.Tweet;
 
 public class ClassifBayes {
 
-	/**
-	 * Fonction qui permet de mettre a la puissance b
-	 * 
-	 * @param a
-	 * @param b
-	 * @return a puissance b
-	 */
-	public static float myPow(float a, float b) {
-		float res = 1;
-		for (int i = 0; i < b; i++) {
-			res *= a;
-		}
-		return res;
-	}
-
+	
 	/**
 	 * Calcule les trois .csv negatifs, positifs et neutre et renvoie le tableau
 	 * contenant le nombre de mots positifs, negatifs et neutres et le nombre de
@@ -227,8 +213,8 @@ public class ClassifBayes {
 										/ (float) (nbMotsTotMood + nbTotal);
 							} else {
 								/* Frequence */
-								probaMot = myPow(
-										((float) (nbMotsMood[j] + 1) / (float) (nbMotsTotMood + nbTotal)),
+								probaMot = (float) Math.pow(
+										((double) (nbMotsMood[j] + 1) / (double) (nbMotsTotMood + nbTotal)),
 										nbMotsTweet[i]);
 
 							}

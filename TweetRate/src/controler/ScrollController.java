@@ -61,6 +61,7 @@ public class ScrollController implements ListSelectionListener {
 			}	
 		}
 		catch(Exception exc){
+			System.out.println("ScrollControl:Exc");
 			System.out.println(exc.getMessage());
 		}
 	}
